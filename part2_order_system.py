@@ -54,13 +54,13 @@ while True:
     
     # Validation
     if not marks_input.isdigit():
-        print("Invalid input! Marks must be numeric.")
+        print("Do not crash, and do not add invalid entries to the list.")
         continue
     
     m = int(marks_input)
     
     if m < 0 or m > 100:
-        print("Marks should be between 0 and 100.")
+        print("Do not crash, and do not add invalid entries to the list.")
         continue
     
     # Add valid data
