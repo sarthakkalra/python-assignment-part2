@@ -293,7 +293,4 @@ for date, orders in sales_log.items():
 for i, (date, order) in enumerate(all_orders, start=1):
     items = ", ".join(order["items"])
     print(f"{i}. [{date}] Order #{order['order_id']} — ₹{order['total']:.2f} — Items: {items}")
-▶️ Run
-
-
 
