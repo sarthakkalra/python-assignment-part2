@@ -1,77 +1,83 @@
-student_name = "Ayesha Sharma"
-subjects     = ["Math", "Physics", "CS", "English", "Chemistry"]
-marks        = [88, 72, 95, 60, 78]
+# -------- Restaurant Order Management System --------
 
-print(f"\nReport Card for {student_name}\n")
+print("\n========== TASK 1: EXPLORE MENU ==========\n")
 
-# Grade function
-def get_grade(m):
-    if 90 <= m <= 100:
-        return "A+"
-    elif 80 <= m <= 89:
-        return "A"
-    elif 70 <= m <= 79:
-        return "B"
-    elif 60 <= m <= 69:
-        return "C"
-    else:
-        return "F"
+menu = {
+    "Paneer Tikka":   {"category": "Starters",  "price": 180.0, "available": True},
+    "Chicken Wings":  {"category": "Starters",  "price": 220.0, "available": False},
+    "Veg Soup":       {"category": "Starters",  "price": 120.0, "available": True},
+    "Butter Chicken": {"category": "Mains",     "price": 320.0, "available": True},
+    "Dal Tadka":      {"category": "Mains",     "price": 180.0, "available": True},
+    "Veg Biryani":    {"category": "Mains",     "price": 250.0, "available": True},
+    "Garlic Naan":    {"category": "Mains",     "price":  40.0, "available": True},
+    "Gulab Jamun":    {"category": "Desserts",  "price":  90.0, "available": True},
+    "Rasgulla":       {"category": "Desserts",  "price":  80.0, "available": True},
+    "Ice Cream":      {"category": "Desserts",  "price": 110.0, "available": False},
+}
 
-# Print subject, marks, grade
-for i in range(len(subjects)):
-    print(f"{subjects[i]} : {marks[i]} ({get_grade(marks[i])})")
+inventory = {
+    "Paneer Tikka":   {"stock": 10, "reorder_level": 3},
+    "Chicken Wings":  {"stock":  8, "reorder_level": 2},
+    "Veg Soup":       {"stock": 15, "reorder_level": 5},
+    "Butter Chicken": {"stock": 12, "reorder_level": 4},
+    "Dal Tadka":      {"stock": 20, "reorder_level": 5},
+    "Veg Biryani":    {"stock":  6, "reorder_level": 3},
+    "Garlic Naan":    {"stock": 30, "reorder_level": 10},
+    "Gulab Jamun":    {"stock":  5, "reorder_level": 2},
+    "Rasgulla":       {"stock":  4, "reorder_level": 3},
+    "Ice Cream":      {"stock":  7, "reorder_level": 4},
+}
 
-# Calculations
-total = sum(marks)
-average = round(total / len(marks), 2)
+sales_log = {
+    "2025-01-01": [
+        {"order_id": 1,  "items": ["Paneer Tikka", "Garlic Naan"],          "total": 220.0},
+        {"order_id": 2,  "items": ["Gulab Jamun", "Veg Soup"],              "total": 210.0},
+        {"order_id": 3,  "items": ["Butter Chicken", "Garlic Naan"],        "total": 360.0},
+    ],
+    "2025-01-02": [
+        {"order_id": 4,  "items": ["Dal Tadka", "Garlic Naan"],             "total": 220.0},
+        {"order_id": 5,  "items": ["Veg Biryani", "Gulab Jamun"],           "total": 340.0},
+    ],
+    "2025-01-03": [
+        {"order_id": 6,  "items": ["Paneer Tikka", "Rasgulla"],             "total": 260.0},
+        {"order_id": 7,  "items": ["Butter Chicken", "Veg Biryani"],        "total": 570.0},
+        {"order_id": 8,  "items": ["Garlic Naan", "Gulab Jamun"],           "total": 130.0},
+    ],
+    "2025-01-04": [
+        {"order_id": 9,  "items": ["Dal Tadka", "Garlic Naan", "Rasgulla"], "total": 300.0},
+        {"order_id": 10, "items": ["Paneer Tikka", "Gulab Jamun"],          "total": 270.0},
+    ],
+}
 
-# Highest & Lowest
-max_marks = max(marks)
-min_marks = min(marks)
+# -------- Print Menu by Category --------
 
-max_index = marks.index(max_marks)
-min_index = marks.index(min_marks)
+categories = set(item["category"] for item in menu.values())
 
-
-print(f"Total Marks : {total}")
-print(f"Average Marks : {average}")
-print(f"Highest Scoring Subject : {subjects[max_index]} ({max_marks})")
-print(f"Lowest Scoring Subject : {subjects[min_index]} ({min_marks})")
-
-
-# ---- While Loop: Add new subjects ----
-new_count = 0
-
-print("\nAdd new subjects (type 'done' to stop):")
-
-while True:
-    sub = input("Enter subject name: ")
+for category in categories:
+    print(f"===== {category} =====")
     
-    if sub.lower() == "done":
-        break
+    for name, details in menu.items():
+        if details["category"] == category:
+            status = "Available" if details["available"] else "Unavailable"
+            print(f"{name:<15} ₹{details['price']:.2f}   [{status}]")
     
-    marks_input = input("Enter marks (0-100): ")
-    
-    # Validation
-    if not marks_input.isdigit():
-        print("Do not crash, and do not add invalid entries to the list.")
-        continue
-    
-    m = int(marks_input)
-    
-    if m < 0 or m > 100:
-        print("Do not crash, and do not add invalid entries to the list.")
-        continue
-    
-    # Add valid data
-    subjects.append(sub)
-    marks.append(m)
-    new_count += 1
 
+# -------- Calculations --------
 
-# Final output
-updated_avg = round(sum(marks) / len(marks), 2)
+total_items = len(menu)
+available_items = sum(1 for item in menu.values() if item["available"])
 
-print("\nFinal Summary:")
-print(f"New Subjects Added : {new_count}")
-print(f"Updated Average    : {updated_avg}") 
+# Most expensive item
+most_expensive = max(menu.items(), key=lambda x: x[1]["price"])
+
+# Items under ₹150
+cheap_items = [(name, d["price"]) for name, d in menu.items() if d["price"] < 150]
+
+print("Summary:")
+print(f"Total Menu Items      : {total_items}")
+print(f"Available Items       : {available_items}")
+print(f"Most Expensive Item   : {most_expensive[0]} (₹{most_expensive[1]['price']})")
+
+print("\nItems under ₹150:")
+for name, price in cheap_items:
+    print(f"{name} - ₹{price}")
