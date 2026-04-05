@@ -81,3 +81,219 @@ print(f"Most Expensive Item   : {most_expensive[0]} (₹{most_expensive[1]['pric
 print("\nItems under ₹150:")
 for name, price in cheap_items:
     print(f"{name} - ₹{price}")
+
+
+# -------- TASK 2: CART OPERATIONS --------
+
+print("\n========== TASK 2: CART OPERATIONS ==========\n")
+
+cart = []
+
+# ---- Helper Functions ----
+
+def add_to_cart(item_name, qty):
+    if item_name not in menu:
+        print(f"{item_name} does not exist in menu.")
+        return
+    
+    if not menu[item_name]["available"]:
+        print(f"{item_name} is currently unavailable.")
+        return
+    
+    # Check if already in cart
+    for item in cart:
+        if item["item"] == item_name:
+            item["quantity"] += qty
+            print(f"Updated {item_name} quantity to {item['quantity']}")
+            return
+    
+    # Add new item
+    cart.append({
+        "item": item_name,
+        "quantity": qty,
+        "price": menu[item_name]["price"]
+    })
+    print(f"Added {item_name} x{qty} to cart")
+
+
+def remove_from_cart(item_name):
+    for item in cart:
+        if item["item"] == item_name:
+            cart.remove(item)
+            print(f"Removed {item_name} from cart")
+            return
+    print(f"{item_name} not found in cart")
+
+
+def print_cart():
+    print("\nCurrent Cart:")
+    if not cart:
+        print("Cart is empty")
+    else:
+        for item in cart:
+            print(f"{item['item']} x{item['quantity']} @ ₹{item['price']}")
+    print("-" * 40)
+
+
+# ---- Simulation Steps ----
+
+add_to_cart("Paneer Tikka", 2)
+print_cart()
+
+add_to_cart("Gulab Jamun", 1)
+print_cart()
+
+add_to_cart("Paneer Tikka", 1)   # should update
+print_cart()
+
+add_to_cart("Mystery Burger", 1)  # does not exist
+print_cart()
+
+add_to_cart("Chicken Wings", 1)   # unavailable
+print_cart()
+
+remove_from_cart("Gulab Jamun")
+print_cart()
+
+
+# ---- Final Order Summary ----
+
+print("\n========== Order Summary ==========")
+
+subtotal = 0
+
+for item in cart:
+    item_total = item["quantity"] * item["price"]
+    subtotal += item_total
+    print(f"{item['item']:<18} x{item['quantity']}    ₹{item_total:.2f}")
+
+gst = subtotal * 0.05
+total = subtotal + gst
+
+print("------------------------------------")
+print(f"Subtotal:                ₹{subtotal:.2f}")
+print(f"GST (5%):                ₹{gst:.2f}")
+print(f"Total Payable:           ₹{total:.2f}")
+print("====================================")
+
+
+
+# -------- TASK 3: INVENTORY TRACKER --------
+
+import copy
+
+print("\n========== TASK 3: INVENTORY TRACKER ==========\n")
+
+# Step 1: Deep copy
+inventory_backup = copy.deepcopy(inventory)
+
+# Step 2: Modify original to prove deep copy
+inventory["Paneer Tikka"]["stock"] = 5
+
+print("After modifying original inventory:")
+print("Inventory:", inventory["Paneer Tikka"])
+print("Backup   :", inventory_backup["Paneer Tikka"])
+
+# Restore original
+inventory = copy.deepcopy(inventory_backup)
+
+print("\nInventory restored.\n")
+
+# Step 3: Deduct stock based on cart (from Task 2)
+
+for item in cart:
+    name = item["item"]
+    qty = item["quantity"]
+    
+    if name in inventory:
+        available_stock = inventory[name]["stock"]
+        
+        if available_stock >= qty:
+            inventory[name]["stock"] -= qty
+        else:
+            print(f"⚠ Not enough stock for {name}. Only {available_stock} available.")
+            inventory[name]["stock"] = 0
+
+# Step 4: Reorder Alerts
+
+print("\nReorder Alerts:")
+
+for name, details in inventory.items():
+    if details["stock"] <= details["reorder_level"]:
+        print(f"⚠ Reorder Alert: {name} — Only {details['stock']} unit(s) left (reorder level: {details['reorder_level']})")
+
+# Step 5: Final comparison
+
+print("\nFinal Inventory (Updated):")
+for name, details in inventory.items():
+    print(f"{name}: {details}")
+
+print("\nBackup Inventory (Original):")
+for name, details in inventory_backup.items():
+    print(f"{name}: {details}")
+    
+
+print("\n========== TASK 4: SALES ANALYSIS ==========\n")
+
+# ---- Revenue per day ----
+daily_revenue = {}
+
+for date, orders in sales_log.items():
+    total = sum(order["total"] for order in orders)
+    daily_revenue[date] = total
+    print(f"{date} : ₹{total:.2f}")
+
+# ---- Best-selling day ----
+best_day = max(daily_revenue, key=daily_revenue.get)
+print(f"\nBest Selling Day: {best_day} (₹{daily_revenue[best_day]:.2f})")
+
+
+# ---- Most ordered item ----
+item_count = {}
+
+for orders in sales_log.values():
+    for order in orders:
+        for item in order["items"]:
+            item_count[item] = item_count.get(item, 0) + 1
+
+most_ordered = max(item_count, key=item_count.get)
+print(f"Most Ordered Item: {most_ordered} ({item_count[most_ordered]} times)")
+
+
+# ---- Add new day ----
+sales_log["2025-01-05"] = [
+    {"order_id": 11, "items": ["Butter Chicken", "Gulab Jamun", "Garlic Naan"], "total": 490.0},
+    {"order_id": 12, "items": ["Paneer Tikka", "Rasgulla"], "total": 260.0},
+]
+
+print("\nAfter Adding New Day:\n")
+
+# Recalculate revenue
+daily_revenue = {}
+
+for date, orders in sales_log.items():
+    total = sum(order["total"] for order in orders)
+    daily_revenue[date] = total
+    print(f"{date} : ₹{total:.2f}")
+
+best_day = max(daily_revenue, key=daily_revenue.get)
+print(f"\nUpdated Best Selling Day: {best_day} (₹{daily_revenue[best_day]:.2f})")
+
+
+# ---- Numbered list of all orders ----
+
+print("\nAll Orders:\n")
+
+all_orders = []
+
+for date, orders in sales_log.items():
+    for order in orders:
+        all_orders.append((date, order))
+
+for i, (date, order) in enumerate(all_orders, start=1):
+    items = ", ".join(order["items"])
+    print(f"{i}. [{date}] Order #{order['order_id']} — ₹{order['total']:.2f} — Items: {items}")
+▶️ Run
+
+
+
